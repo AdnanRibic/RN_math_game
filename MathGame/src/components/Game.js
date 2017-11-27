@@ -1,22 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import RandomNumber from './RandomNumber';
-import { View, Text, StyleSheet, ImageBackground } from 'react-native';
+import shuffle from 'lodash.shuffle';
+import { View, Text, StyleSheet, ImageBackground, Button } from 'react-native';
 
 class Game extends React.Component {
     static propTypes = {
         randomNumberCount: PropTypes.number.isRequired,
         initialSeconds: PropTypes.number.isRequired,
+        onPlayAgain:PropTypes.func.isRequired,
     };
     state = {
         selectedIds: [],
         remainingSeconds: this.props.initialSeconds,
     };
+    gameStatus = 'PLAYING';
     randomNumbers = Array.from({ length: this.props.randomNumberCount })
                          .map(() => 1 + Math.floor(10 * Math.random()));
     target = this.randomNumbers
         .slice(0, this.props.randomNumberCount -2)
         .reduce((acc, curr) => acc + curr, 0);
+    shuffledRandomNumbers = shuffle(this.randomNumbers);
 
     componentDidMount() {
         this.intervalId = setInterval(() => {
@@ -44,11 +48,19 @@ class Game extends React.Component {
         });
     }
 
-    gameStatus = () => {
-        const sumSelected = this.state.selectedIds.reduce((acc, curr) => {
-            return acc + this.randomNumbers[curr];
+    componentWillUpdate(nextProps, nextState) {
+        if (nextState.selectedIds !== this.state.selectedIds || nextState.remainingSeconds === 0) {
+            this.gameStatus = this.calcGameStatus(nextState);
+            if (this.gameStatus !== 'PLAYING') {
+                clearInterval(this.intervalId);
+            }
+    }}
+
+    calcGameStatus = (nextState) => {
+        const sumSelected = nextState.selectedIds.reduce((acc, curr) => {
+            return acc + this.shuffledRandomNumbers[curr];
         }, 0);
-        if (this.state.remainingSeconds === 0) {
+        if (nextState.remainingSeconds === 0) {
             return 'LOST';
         }
         if (sumSelected < this.target) {
@@ -62,14 +74,15 @@ class Game extends React.Component {
         }
     }
     render() {
-        const gameStatus = this.gameStatus();
+        const gameStatus = this.gameStatus;
         return (
             <ImageBackground
-        source={require('../img/Azure.jpg')}
+        //source={require('../img/Azure.jpg')}
+        backgroundColor='#006E51'
         style={styles.container}>
         <Text style={[styles.text, styles[`STATUS_${gameStatus}`]]}>{this.target}</Text>
         <View style={styles.randomContainer}>
-        {this.randomNumbers.map((randomNumber, index) => 
+        {this.shuffledRandomNumbers.map((randomNumber, index) => 
             <RandomNumber 
                 key={index} 
                 id={index}
@@ -79,7 +92,13 @@ class Game extends React.Component {
             />
         )}
         </View>
-        <Text>{ this.state.remainingSeconds }</Text>
+        <View style={styles.infoContainer}>
+        <View style={styles.buttons}>
+        <Button color='white' title="Reset" onPress={this.props.onPlayAgain} />
+        <Button color='white' title="Stop" onPress={this.props.onPlayAgain} />
+        </View>
+        <Text style={styles.timerText} >Remaining seconds: { this.state.remainingSeconds }</Text>
+        </View>
       </ImageBackground>
         );
     }
@@ -95,23 +114,36 @@ const styles = StyleSheet.create({
         //alignItems: 'center',
         paddingTop: 50,
       },
+    infoContainer: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        backgroundColor: '#005960',
+    },
+    buttons: {
+        justifyContent: 'center',
+        flexDirection: 'row',
+    },
+    timerText: {
+        color: 'white',
+        fontSize: 15,
+    },
     text: {
         fontSize: 70,
-        color: 'white',
+        color: '#F7786B',
         //marginHorizontal: 50,
         textAlign: 'center',
         borderRadius: 5, 
     },
     randomContainer: {
-        flex: 1,
-        //flexDirection: 'column',
+        flex: 5,
+        flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'center',
         paddingTop: 20,
     },
     STATUS_PLAYING: {
         backgroundColor: 'transparent',
-        color: 'black',
+        color: '#F7786B',
         borderRadius: 5,
     },
     STATUS_WON: {
