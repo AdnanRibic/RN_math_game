@@ -14,7 +14,7 @@ class App extends React.Component {
         return (
             <Game key={this.state.gameId} 
             onPlayAgain={this.resetGame}
-            randomNumberCount={10} initialSeconds={10}/>
+            randomNumberCount={4} initialSeconds={10}/>
         );
     }
 }

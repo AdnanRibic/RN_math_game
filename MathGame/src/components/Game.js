@@ -78,7 +78,7 @@ class Game extends React.Component {
         return (
             <ImageBackground
         //source={require('../img/Azure.jpg')}
-        backgroundColor='#006E51'
+        backgroundColor='#FFF1D0'
         style={styles.container}>
         <Text style={[styles.text, styles[`STATUS_${gameStatus}`]]}>{this.target}</Text>
         <View style={styles.randomContainer}>
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     infoContainer: {
         flex: 1,
         justifyContent: 'flex-end',
-        backgroundColor: '#005960',
+        backgroundColor: '#06AED5',
     },
     buttons: {
         justifyContent: 'center',
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: 70,
-        color: '#F7786B',
+        color: '#086788',
         //marginHorizontal: 50,
         textAlign: 'center',
         borderRadius: 5, 
@@ -143,14 +143,16 @@ const styles = StyleSheet.create({
     },
     STATUS_PLAYING: {
         backgroundColor: 'transparent',
-        color: '#F7786B',
+        color: '#086788',
         borderRadius: 5,
     },
     STATUS_WON: {
         backgroundColor: 'green',
+        color: 'white',
     },
     STATUS_LOST: {
-        backgroundColor: 'red',
+        backgroundColor: '#DD1C1A',
+        color: 'white',
     },
 });
 
